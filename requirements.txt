@@ -1,3 +1,7 @@
 transformers
 sentence_transformers
 faiss-gpu 
+
+llama-index-llms-huggingface
+llama-index
+numva
