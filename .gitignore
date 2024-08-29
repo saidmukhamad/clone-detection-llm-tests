@@ -1,3 +1,4 @@
 
 /llm-env
 node-modules
+.ipynb_checkpoints

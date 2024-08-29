@@ -5,15 +5,15 @@ import networkx as nx
 import matplotlib.pyplot as plt
 from pydantic import BaseModel, Field
 import outlines
+import json
+import re
 from typing import List, Dict, Tuple
 import torch
 import random
-import re
 import faiss
 import numpy as np
 
-from transformers import AutoModelForCausalLM, AutoTokenizer
-
+from transformers import AutoModelForCausalLM, AutoTokenizer, BitsAndBytesConfig
 from llama_index.core import ServiceContext
 from llama_index.core import VectorStoreIndex, SimpleDirectoryReader
 
@@ -73,9 +73,6 @@ def process_directory(directory_path: str) -> List[Dict[str, str]]:
     return code_snippets
 
 
-import json
-import re
-from typing import List, Dict
 
 def detect_clones(code_snippets: List[Dict[str, str]], outlines_model) -> CloneDetectionResult:
     prompt = clone_detection_prompt(files=code_snippets)
@@ -244,6 +241,7 @@ def main(directory_path: str, model_name: str):
     print('Prompt')
 
     prompt = clone_detection_prompt(files=code_snippets)
+    
     # Run clone detection
     print("Running clone detection...")
     result = detect_clones(code_snippets, outlines_model)
@@ -252,19 +250,16 @@ def main(directory_path: str, model_name: str):
     # Save results to vector store
     save_to_vector_store(result, code_snippets, model_name)
 
-    # Print results
     print("Clone detection results:")
-    # print_results(result)
     result = []
     return result, code_snippets
 
 
 
-
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Code Clone Detection")
-    parser.add_argument("directory_path", help="Path to the directory containing Python files")
-    parser.add_argument("--model", default="microsoft/Phi-3.5-mini-instruct", help="Name of the Hugging Face model to use")
+    parser.add_argument("--directory_path", default="./mutated" help="Path to the directory containing Python files")
+    parser.add_argument("--model", default="meta-llama/Meta-Llama-3.1-8B-Instruct", help="Name of the Hugging Face model to use")
     args = parser.parse_args()
 
     result, code_snippets = main(args.directory_path, args.model)
